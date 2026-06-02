@@ -12,7 +12,7 @@ const pool = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
   password: process.env.DB_PASSWORD || '',
-  database: process.env.DB_NAME || 'deliverydb',
+  database: process.env.DB_NAME || 'deliverydatabase',
   waitForConnections: true,
   connectionLimit: 10
 });
@@ -38,9 +38,10 @@ app.use("/api/delivery", require("./routes/delivery"));
 app.use("/api/orders", require("./routes/orders"));
 app.use("/api/revenue", require("./routes/revenue"));
 app.use("/api/complaints", require("./routes/complaints"));
+app.use("/api/drivers", require("./routes/drivers"));
 console.log("✅ Routes loaded!");
 
-const PORT = process.env.PORT || 5000;
+const PORT = process.env.PORT || 5006;
 server.listen(PORT, '0.0.0.0', async () => {
   try {
     await pool.getConnection();
