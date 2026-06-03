@@ -84,7 +84,7 @@ export default function App() {
 
   return (
     <div className="app-container">
-      <h1>📦 Delivery Order Management System</h1>
+      <h1>🚚 Smart Logistics Management System</h1>
       
       {/* Stats Overview */}
       <div className="stats-overview">

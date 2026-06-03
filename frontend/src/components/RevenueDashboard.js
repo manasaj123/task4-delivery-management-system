@@ -38,15 +38,21 @@ const RevenueDashboard = ({ orders = [], deliveries = [], complaints = [] }) => 
     const deliveredOrdersCount = deliveredOrders.length;
     const pendingOrders = orders.filter(o => o.status === 'pending').length;
     const cancelledOrders = orders.filter(o => o.status === 'cancelled').length;
-    const returnedOrders = orders.filter(o => o.status === 'returned').length;
+    // const returnedOrders = orders.filter(o => o.status === 'returned').length;
+    const returnedOrders = orders.filter(
+  o => parseFloat(o.credit_note_amount || 0) > 0
+).length;
     
     // Revenue calculations
     const deliveredRevenue = deliveredOrders.reduce((sum, o) => 
       sum + (parseFloat(o.total_amount) || 0), 0
     );
+    // const returnedAmount = orders
+    //   .filter(o => o.status === 'returned')
+    //   .reduce((sum, o) => sum + (parseFloat(o.credit_note_amount) || 0), 0);
     const returnedAmount = orders
-      .filter(o => o.status === 'returned')
-      .reduce((sum, o) => sum + (parseFloat(o.credit_note_amount) || 0), 0);
+  .filter(o => parseFloat(o.credit_note_amount || 0) > 0)
+  .reduce((sum, o) => sum + (parseFloat(o.credit_note_amount) || 0), 0);
     const netRevenue = deliveredRevenue - returnedAmount;
     
     // Average order value
