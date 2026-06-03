@@ -12,7 +12,7 @@ router.get("/summary", async (req, res) => {
     
     // Total returned amount
     const [totalReturned] = await db.execute(
-      "SELECT COALESCE(SUM(credit_note_amount), 0) as total FROM orders WHERE status = 'returned' AND credit_note_issued = TRUE"
+  "SELECT COALESCE(SUM(credit_note_amount), 0) as total FROM orders WHERE credit_note_amount > 0"
     );
     
     // Monthly revenue (delivered)
