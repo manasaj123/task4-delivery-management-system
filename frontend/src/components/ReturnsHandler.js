@@ -209,7 +209,11 @@ const ReturnsHandler = ({ orders, setOrders, deliveries, setDeliveries, refreshA
 
   const filteredOrders = orders.filter(order => {
     if (activeFilter === "all") return true;
-    return order.status === activeFilter;
+    if (activeFilter === "returned") {
+  return order.return_reason || Number(order.credit_note_amount) > 0;
+}
+
+return order.status === activeFilter;
   });
 
   const statusCounts = {
@@ -217,7 +221,9 @@ const ReturnsHandler = ({ orders, setOrders, deliveries, setDeliveries, refreshA
     pending: orders.filter(o => o.status === 'pending').length,
     delivered: orders.filter(o => o.status === 'delivered').length,
     cancelled: orders.filter(o => o.status === 'cancelled').length,
-    returned: orders.filter(o => o.status === 'returned').length
+    returned: orders.filter(
+  o => o.return_reason || Number(o.credit_note_amount) > 0
+).length
   };
 
   return (
