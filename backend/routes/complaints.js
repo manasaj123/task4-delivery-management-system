@@ -65,25 +65,54 @@ router.put('/:id/escalate', async (req, res) => {
 });
 
 // PUT resolve complaint
+// PUT resolve complaint with manager review
 router.put('/:id/resolve', async (req, res) => {
   try {
     const { id } = req.params;
-    
+
+    const {
+      resolution_type,
+      manager_notes,
+      customer_message,
+      resolved_by
+    } = req.body;
+
     await pool.execute(
-      "UPDATE complaints SET status = 'resolved', updated_at = CURRENT_TIMESTAMP WHERE id = ?",
+      `UPDATE complaints
+       SET status = 'resolved',
+           resolution_type = ?,
+           manager_notes = ?,
+           customer_message = ?,
+           resolved_by = ?,
+           updated_at = CURRENT_TIMESTAMP
+       WHERE id = ?`,
+      [
+        resolution_type || null,
+        manager_notes || null,
+        customer_message || null,
+        resolved_by || 'Manager',
+        id
+      ]
+    );
+
+    const [updated] = await pool.execute(
+      'SELECT * FROM complaints WHERE id = ?',
       [id]
     );
-    
-    const [updated] = await pool.execute('SELECT * FROM complaints WHERE id = ?', [id]);
-    
+
     if (updated.length === 0) {
-      return res.status(404).json({ error: 'Complaint not found' });
+      return res.status(404).json({
+        error: 'Complaint not found'
+      });
     }
-    
+
     res.json(updated[0]);
+
   } catch (error) {
     console.error('Resolve error:', error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({
+      error: error.message
+    });
   }
 });
 

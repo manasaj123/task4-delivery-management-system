@@ -16,6 +16,12 @@ const ComplaintManager = ({ complaints, setComplaints, orders, deliveries, refre
   const [successMsg, setSuccessMsg] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [searchTerm, setSearchTerm] = useState('');
+  const [managerReview, setManagerReview] = useState({
+  resolution_type: '',
+  manager_notes: '',
+  customer_message: '',
+  resolved_by: 'Manager'
+});
 
   useEffect(() => {
     fetchComplaints();
@@ -91,16 +97,33 @@ const ComplaintManager = ({ complaints, setComplaints, orders, deliveries, refre
     }
   };
 
-  const handleResolve = async (id) => {
-    try {
-      await axios.put(`/api/complaints/${id}/resolve`);
-      fetchComplaints();
-      if (refreshAllData) refreshAllData();
-    } catch (err) {
-      console.error("Resolution failed", err);
-      alert('Failed to resolve complaint');
+ const handleResolve = async (id) => {
+  try {
+    await axios.put(`/api/complaints/${id}/resolve`, {
+      resolution_type: managerReview.resolution_type,
+      manager_notes: managerReview.manager_notes,
+      customer_message: managerReview.customer_message,
+      resolved_by: managerReview.resolved_by
+    });
+
+    setManagerReview({
+      resolution_type: '',
+      manager_notes: '',
+      customer_message: '',
+      resolved_by: 'Manager'
+    });
+
+    fetchComplaints();
+
+    if (refreshAllData) {
+      refreshAllData();
     }
-  };
+
+  } catch (err) {
+    console.error("Resolution failed", err);
+    alert("Failed to resolve complaint");
+  }
+};
 
   const handleClose = async (id) => {
     try {
@@ -432,6 +455,81 @@ const ComplaintManager = ({ complaints, setComplaints, orders, deliveries, refre
                       ))}
                     </div>
                     
+                    {c.status === 'in_progress' && (
+  <div
+    style={{
+      marginTop: '15px',
+      padding: '12px',
+      background: '#f8f9fa',
+      borderRadius: '8px',
+      border: '1px solid #ddd'
+    }}
+  >
+    <h4>👨‍💼 Manager Resolution Panel</h4>
+
+    <select
+      onChange={(e) =>
+        setManagerReview({
+          ...managerReview,
+          resolution_type: e.target.value
+        })
+      }
+      style={{
+        width: '100%',
+        padding: '8px',
+        marginBottom: '8px'
+      }}
+    >
+      <option value="">Select Resolution</option>
+      <option value="refund">💰 Refund Processed</option>
+      <option value="reschedule">📅 Order Rescheduled</option>
+      <option value="replacement">🔄 Replacement Sent</option>
+      <option value="priority_delivery">🚚 Priority Delivery</option>
+    </select>
+
+    <textarea
+      placeholder="Manager Notes"
+      onChange={(e) =>
+        setManagerReview({
+          ...managerReview,
+          manager_notes: e.target.value
+        })
+      }
+      style={{
+        width: '100%',
+        marginBottom: '8px'
+      }}
+    />
+
+    <textarea
+      placeholder="Message to Customer"
+      onChange={(e) =>
+        setManagerReview({
+          ...managerReview,
+          customer_message: e.target.value
+        })
+      }
+      style={{
+        width: '100%',
+        marginBottom: '8px'
+      }}
+    />
+
+    <button
+      onClick={() => handleResolve(c.id)}
+      style={{
+        background: '#28a745',
+        color: '#fff',
+        border: 'none',
+        padding: '10px 15px',
+        borderRadius: '5px',
+        cursor: 'pointer'
+      }}
+    >
+      ✅ Manager Resolve Complaint
+    </button>
+  </div>
+)}
                     <div style={{ marginTop: '8px', fontSize: '11px', color: '#999' }}>
                       ID: {c.id} | Created: {new Date(c.created_at).toLocaleString()}
                       {c.assigned_to && <span> | Assigned to: {c.assigned_to}</span>}
