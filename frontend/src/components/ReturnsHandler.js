@@ -210,7 +210,7 @@ const ReturnsHandler = ({ orders, setOrders, deliveries, setDeliveries, refreshA
   const filteredOrders = orders.filter(order => {
     if (activeFilter === "all") return true;
     if (activeFilter === "returned") {
-  return order.return_reason || Number(order.credit_note_amount) > 0;
+  return order.status === "returned";
 }
 
 return order.status === activeFilter;
@@ -222,7 +222,7 @@ return order.status === activeFilter;
     delivered: orders.filter(o => o.status === 'delivered').length,
     cancelled: orders.filter(o => o.status === 'cancelled').length,
     returned: orders.filter(
-  o => o.return_reason || Number(o.credit_note_amount) > 0
+  o => o.status === 'returned'
 ).length
   };
 
@@ -416,16 +416,28 @@ return order.status === activeFilter;
                       fontSize: '12px',
                       fontWeight: 'bold',
                       textTransform: 'uppercase',
-                      background: 
-                        order.status === 'delivered' ? '#d4edda' : 
-                        order.status === 'pending' ? '#fff3cd' : 
-                        order.status === 'cancelled' ? '#f8d7da' : '#e8daef',
-                      color: 
-                        order.status === 'delivered' ? '#155724' : 
-                        order.status === 'pending' ? '#856404' : 
-                        order.status === 'cancelled' ? '#721c24' : '#6f42c1'
+                      background:
+  (order.return_reason || Number(order.credit_note_amount) > 0)
+    ? '#e8daef'
+    : order.status === 'delivered'
+    ? '#d4edda'
+    : order.status === 'pending'
+    ? '#fff3cd'
+    : order.status === 'cancelled'
+    ? '#f8d7da'
+    : '#e8daef',
+                      color:
+  (order.return_reason || Number(order.credit_note_amount) > 0)
+    ? '#6f42c1'
+    : order.status === 'delivered'
+    ? '#155724'
+    : order.status === 'pending'
+    ? '#856404'
+    : order.status === 'cancelled'
+    ? '#721c24'
+    : '#6f42c1'
                     }}>
-                      {order.status}
+                      {order.status.toUpperCase()}
                     </span>
                   </div>
                 </div>
@@ -612,7 +624,9 @@ return order.status === activeFilter;
                     </button>
                   )}
 
-                  {order.status === 'delivered' && (
+                  {order.status === 'delivered' &&
+ !order.return_reason &&
+ Number(order.credit_note_amount) === 0 && (
                     <button
                       onClick={() => {
                         setSelectedOrder(order.order_id);

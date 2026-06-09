@@ -205,24 +205,60 @@ const DeliveryScheduler = ({ deliveries, setDeliveries, orders, setOrders, drive
           <form onSubmit={handleSchedule}>
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Order ID *</label>
-              <input 
-                placeholder="ORD-001" 
-                value={formData.order_id}
-                onChange={(e) => setFormData({...formData, order_id: e.target.value})}
-                required 
-                style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
-              />
+              <select
+  value={formData.order_id}
+  onChange={(e) => {
+    const selectedOrder = orders.find(
+      o => o.order_id === e.target.value
+    );
+
+    if (selectedOrder) {
+      setFormData({
+        ...formData,
+        order_id: selectedOrder.order_id,
+        customer_name: selectedOrder.customer_name || '',
+        customer_phone: selectedOrder.customer_phone || '',
+        total_amount: selectedOrder.total_amount || ''
+      });
+    }
+  }}
+  required
+  style={{
+    width: '100%',
+    padding: '10px',
+    borderRadius: '5px',
+    border: '1px solid #ddd'
+  }}
+>
+  <option value="">Select Existing Order</option>
+
+  {orders.map(order => (
+    <option
+      key={order.order_id}
+      value={order.order_id}
+    >
+      {order.order_id} - {order.customer_name} (₹{order.total_amount})
+    </option>
+  ))}
+</select>
             </div>
             
             <div style={{ marginBottom: '15px' }}>
               <label style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>Customer Name *</label>
-              <input 
-                placeholder="Customer Name" 
-                value={formData.customer_name}
-                onChange={(e) => setFormData({...formData, customer_name: e.target.value})}
-                required
-                style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
-              />
+              <input
+  placeholder="Customer Name"
+  value={formData.customer_name}
+  readOnly
+  onChange={(e) => setFormData({...formData, customer_name: e.target.value})}
+  required
+  style={{
+    width: '100%',
+    padding: '10px',
+    borderRadius: '5px',
+    border: '1px solid #ddd',
+    background: '#f5f5f5'
+  }}
+/>
             </div>
             
             <div style={{ marginBottom: '15px' }}>
@@ -230,6 +266,7 @@ const DeliveryScheduler = ({ deliveries, setDeliveries, orders, setOrders, drive
               <input 
                 placeholder="Phone Number" 
                 value={formData.customer_phone}
+                readOnly
                 onChange={(e) => setFormData({...formData, customer_phone: e.target.value})}
                 style={{ width: '100%', padding: '10px', borderRadius: '5px', border: '1px solid #ddd' }}
               />
