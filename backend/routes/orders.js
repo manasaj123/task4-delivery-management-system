@@ -39,9 +39,15 @@ router.post('/create', async (req, res) => {
 
     // Try inserting with common fields
     const [result] = await db.execute(
-      'INSERT INTO orders (order_id, customer_name, total_amount, status) VALUES (?, ?, ?, ?)',
-      [order_id, customer_name, parseFloat(total_amount), status || 'pending']
-    );
+  'INSERT INTO orders (order_id, customer_name, customer_phone, total_amount, status) VALUES (?, ?, ?, ?, ?)',
+  [
+    order_id,
+    customer_name,
+    customer_phone,
+    parseFloat(total_amount),
+    status || 'pending'
+  ]
+);
 
     const [newOrder] = await db.execute(
       'SELECT * FROM orders WHERE id = ?',
